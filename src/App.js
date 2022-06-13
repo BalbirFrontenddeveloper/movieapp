@@ -1,25 +1,62 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useEffect, useState } from 'react';
+import MovieCard from './Component/MovieCard';
 
-function App() {
+
+const App = () => {
+  
+  const API_URL ='http://www.omdbapi.com?apikey=3a08f981'
+    const [searchText, setSearchText] = useState("");
+    const [movies, setMovies] = useState([])
+    
+    const movie = {
+        "Title": "Undefined",
+        "Year": "2006",
+        "imdbID": "tt1436480",
+        "Type": "movie",
+        "Poster": "https://m.media-amazon.com/images/M/MV5BMTgzNzkxMzk5Nl5BMl5BanBnXkFtZTgwMTQ2MzA2MDE@._V1_SX300.jpg"
+    };
+    
+    const searchMovies = async (title)=>{
+        const response = await fetch(`${API_URL}&s=${title}`);
+        const data = await response.json();
+        console.log(data);
+        setMovies(data.Search);
+    };
+
+    useEffect(()=>{
+        searchMovies();
+    },[]);
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div className='app'>
+        <h1>MovieLand</h1>
+        <div className='search'>
+            <input
+            placeholder='Search movies here'
+            value={searchText}
+            onChange={(e)=>{setSearchText(e.target.value)}}
+            />
+            <input
+            type="button"
+            onClick={()=>{searchMovies(searchText)}}
+            />
+        </div>
+
+        { movies?.length > 0 ? (
+            <div className='container'>
+                { movies.map((movie)=> (
+                  <div key={movie.imdbID}>
+                    <MovieCard movie={movie}/>
+                    </div>
+                ))}
+            </div>
+        ) : <div className="empty">
+        <h2>No movies found</h2>
+      </div>
+      }
+
     </div>
-  );
+  )
 }
 
 export default App;
